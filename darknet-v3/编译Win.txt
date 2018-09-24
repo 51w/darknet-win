@@ -1,0 +1,92 @@
+移植过程：
+
+1.VS2015创建控制台程序
+
+2.拷贝darknet目录下的include src <example相关文件>
+
+3.VS添加文件到工程
+
+4.添加pthread头文件和库
+
+error：
+无法打开包括文件: “unistd.h”  //屏蔽
+sys/timer.h
+what_time_is_it_now //注释掉
+fopen屏蔽4996
+void*  >  char*
+
+void sorta_shuffle(void *arr, size_t n, size_t size, size_t sections)
+{
+    
+	size_t i;
+    
+	for(i = 0; i < sections; ++i){
+
+        size_t start = n*i/sections;
+
+        size_t end = n*(i+1)/sections;
+
+        size_t num = end-start;
+
+        shuffle((char*)arr+(start*size), num, size);
+
+    }
+
+}
+
+
+
+void shuffle(char *arr, size_t n, size_t size)
+{
+
+    size_t i;
+
+    void *swp = calloc(1, size);
+
+    for(i = 0; i < n-1; ++i){
+
+        size_t j = i + rand()/(RAND_MAX / (n-i)+1);
+
+        memcpy(swp,          arr+(j*size), 
+	memcpy(arr+(j*size), arr+(i*size), size);
+
+        memcpy(arr+(i*size), swp,          size);
+    
+    }
+
+}
+
+
+去掉源文件compare.c编译
+
+
+5.完成CPU_ONLY版本
+
+6.增加OpenCV支持  宏定义
+
+
+7.GPU支持
+A 宏定义GPU
+B 项目>生成自定义>添加CUDA9.1
+C 添加*.cu文件
+D 4819警告 -Xcompiler "/wd4819" 
+
+
+cublas.lib;cublas_device.lib;cuda.lib;cudadevrt.lib;cudart.lib;cudart_static.lib;cufft.lib;cufftw.lib;curand.lib;cusolver.lib;cusparse.lib;nppc.lib;nppial.lib;nppicc.lib;nppicom.lib;nppidei.lib;nppif.lib;nppig.lib;nppim.lib;nppist.lib;nppisu.lib;nppitc.lib;npps.lib;nvblas.lib;nvcuvid.lib;nvgraph.lib;nvml.lib;nvrtc.lib;
+添加CUDA头文件和库文件
+cublas.lib
+cublas_device.lib
+cudadevrt.lib
+cudart.lib
+cudart_static.lib
+cufft.lib
+cufftw.lib
+curand.lib
+
+
+
+
+
+
+
+

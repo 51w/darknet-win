@@ -1,0 +1,62 @@
+﻿[1.安装]
+
+git clone https://github.com/pjreddie/darknet
+cd darknet
+make
+./darknet detect cfg/yolov3.cfg yolov3.weights data/dog.jpg
+
+wget https://pjreddie.com/media/files/voc_label.py
+
+
+[2.加速OpenBLAS]
+
+#include "cblas.h"
+gemm_cpu()
+{...
+    if(!TA && !TB)
+		cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, M, N, K, ALPHA, A, lda, B, ldb, BETA, C, ldc);
+        //gemm_nn(M, N, K, ALPHA,A,lda, B, ldb,C,ldc);
+    else if(TA && !TB)
+        //gemm_tn(M, N, K, ALPHA,A,lda, B, ldb,C,ldc);
+		cblas_sgemm(CblasRowMajor, CblasTrans, CblasNoTrans, M, N, K, ALPHA, A, lda, B, ldb, BETA, C, ldc);
+    else if(!TA && TB)
+        //gemm_nt(M, N, K, ALPHA,A,lda, B, ldb,C,ldc);
+		cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasTrans, M, N, K, ALPHA, A, lda, B, ldb, BETA, C, ldc);
+    else
+        //gemm_tt(M, N, K, ALPHA,A,lda, B, ldb,C,ldc);
+		cblas_sgemm(CblasRowMajor, CblasTrans, CblasTrans, M, N, K, ALPHA, A, lda, B, ldb, BETA, C, ldc);
+}
+-lopenblas
+
+
+[3.制作数据VOC]
+
+VOC-zz/VOCdevkit  -->  JPEGImages Annotations [Labelimg]  -->  [find *.xml > ../main.txt]
+-->  [main.txt去掉.xml]  -->  voc_label.py
+
+数据制作成功：1.trian.txt保存每张图片路径    2. VOCdevkit/labes/* 保存类别和矩形框
+ren *.bmp *.jpg 
+
+[data]
+classes= 1
+train  = /home/wang/NFS/darknet/VOC-zz/train.txt
+valid  = /home/wang/NFS/darknet/VOC-zz/train.txt
+names = VOC-zz/zan.names
+backup = VOC-zz/backup
+
+[names]
+zan
+
+
+
+[4.训练]
+
+./darknet detector train VOC-zz/zan.data VOC-zz/zan.cfg
+
+
+[5.测试]
+
+./darknet detect cfg/yolov3.cfg yolov3.weights data/dog.jpg
+./darknet detector test cfg/coco.data cfg/yolov3.cfg yolov3.weights data/dog.jpg
+
+./darknet detector test VOC-zz/zan.data VOC-zz/zan.cfg VOC-zz/backup/zan.backup VOC-zz/VOCdevkit/JPEGImages/IMG_1012.jpg -thresh 0.05
